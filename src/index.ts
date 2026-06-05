@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { configDotenv } from "dotenv";
 import { serve } from "@hono/node-server";
-import notesRoute from './routes/notes';
+import { notesRoute } from './routes/notes';
 
 
 configDotenv();

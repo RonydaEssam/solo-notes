@@ -1,36 +1,46 @@
-import { Context, Hono } from "hono";
-import { notes } from "../data/notes-data";
-import Note from "../lib/types";
+import { Context } from "hono";
+import { prisma } from "../lib/prisma";
 
-const getNotes = (c: Context) => {
-    return c.json({ notes })
+const getNotes = async (c: Context) => {
+    const notes = await prisma.note.findMany();
+
+    return c.json({ notes });
+}
+
+const getNoteById = async (c: Context) => {
+    const reqId = Number(c.req.param('id'));
+    const note = await prisma.note.findUnique({ where: { id: reqId } });
+
+    if (!note) {
+        return c.json({ error: 'note not found' })
+    }
+
+    return c.json({ note });
 }
 
 const createNote = async (c: Context) => {
-    const noteBody = await c.req.json();
+    const body = await c.req.json();
 
-    const newNote: Note = {
-        id: notes.length + 1,
-        title: noteBody.title,
-        body: noteBody.body
-    }
+    const newNote = await prisma.note.create({
+        data: {
+            title: body.title,
+            body: body.body
+        }
+    });
 
-    notes.push(newNote);
-
-    return c.json({ message: "success", params: newNote })
+    return c.json({ message: "success", params: newNote });
 }
 
-const deleteNote = (c: Context) => {
+const deleteNote = async (c: Context) => {
     const reqId = Number(c.req.param('id'));
-    const noteId = notes.findIndex(u => u.id === reqId)
+    const noteId = await prisma.note.findUnique({ where: { id: reqId } });
 
-    if (noteId === -1) {
+    if (!noteId) {
         return c.json({ error: 'note Id not found' })
     }
 
-    notes.splice(noteId, 1);
-    return c.json({ message: `note ${reqId} deleted!` })
-
+    await prisma.note.delete({ where: { id: reqId } });
+    return c.json({ message: `note ${reqId} deleted!` });
 }
 
-export { getNotes, createNote, deleteNote };
+export { getNotes, getNoteById, createNote, deleteNote };

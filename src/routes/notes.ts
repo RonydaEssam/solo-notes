@@ -1,14 +1,14 @@
 import { Hono } from "hono";
-import { createNote, deleteNote, getNotes } from "../handlers/notes-handler";
+import { createNote, deleteNote, getNotes, getNoteById } from "../handlers/notes-handler";
 
 const notesRoute = new Hono();
 
-const createNoteSchema = {}
+notesRoute.get('/', getNotes);
 
-notesRoute.get('/', getNotes)
+notesRoute.get('/:id', getNoteById);
 
-notesRoute.post('/', createNote)
+notesRoute.post('/', createNote);
 
-notesRoute.delete('/:id', deleteNote)
+notesRoute.delete('/:id', deleteNote);
 
-export default notesRoute;
+export { notesRoute };
