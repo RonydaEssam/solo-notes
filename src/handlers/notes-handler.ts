@@ -18,7 +18,7 @@ const getNoteById = async (c: Context) => {
         const note = await prisma.note.findUnique({ where: { id: reqId } });
 
         if (!note) {
-            return c.json({ error: 'note not found' })
+            return c.json({ error: 'note not found' }, 404)
         }
 
         return c.json({ note });
@@ -55,7 +55,7 @@ const deleteNote = async (c: Context) => {
         const noteId = await prisma.note.findUnique({ where: { id: reqId } });
 
         if (!noteId) {
-            return c.json({ error: 'note Id not found' })
+            return c.json({ error: 'note Id not found' }, 404)
         }
 
         await prisma.note.delete({ where: { id: reqId } });
