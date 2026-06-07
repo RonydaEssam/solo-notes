@@ -1,5 +1,6 @@
 import { Context } from "hono";
 import { prisma } from "../lib/prisma";
+import { createNoteSchema } from "../lib/schemas";
 
 const getNotes = async (c: Context) => {
     const notes = await prisma.note.findMany();
@@ -20,11 +21,16 @@ const getNoteById = async (c: Context) => {
 
 const createNote = async (c: Context) => {
     const body = await c.req.json();
+    const result = createNoteSchema.safeParse(body);
+
+    if (!result.success) {
+        return c.json({ error: 'Invalid Input', message: 'make sure title and body are not empty' }, 400)
+    }
 
     const newNote = await prisma.note.create({
         data: {
-            title: body.title,
-            body: body.body
+            title: result.data.title,
+            body: result.data.body
         }
     });
 
