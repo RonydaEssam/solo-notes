@@ -3,6 +3,7 @@ import { configDotenv } from "dotenv";
 import { serve } from "@hono/node-server";
 import { notesRoute } from './routes/notes';
 import { logger } from "./middleware/logger";
+import { cors } from 'hono/cors'
 
 
 configDotenv();
@@ -12,6 +13,7 @@ const port = Number(process.env.PORT) || 3000;
 const appName = process.env.APP_NAME;
 
 app.use('*', logger);
+app.use('*', cors())
 
 app.route('/notes', notesRoute);
 
